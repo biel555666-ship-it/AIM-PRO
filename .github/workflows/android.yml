@@ -1,4 +1,5 @@
 
+
 name: Build AIM PRO APK
 
 on:
@@ -22,6 +23,37 @@ jobs:
 
       - name: Extract project
         run: unzip -o AIM_PRO_Android_Projeto.zip -d .
+
+      - name: Fix JVM compatibility
+        run: |
+          cat > app/build.gradle <<'EOF'
+          plugins {
+              id 'com.android.application'
+              id 'org.jetbrains.kotlin.android'
+          }
+
+          android {
+              namespace 'com.aimpro.crosshair'
+              compileSdk 35
+
+              defaultConfig {
+                  applicationId 'com.aimpro.crosshair'
+                  minSdk 23
+                  targetSdk 34
+                  versionCode 1
+                  versionName '1.0'
+              }
+
+              compileOptions {
+                  sourceCompatibility JavaVersion.VERSION_17
+                  targetCompatibility JavaVersion.VERSION_17
+              }
+
+              kotlinOptions {
+                  jvmTarget = '17'
+              }
+          }
+          EOF
 
       - name: Build APK
         uses: gradle/gradle-build-action@v3
